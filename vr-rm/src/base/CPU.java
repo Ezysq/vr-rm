@@ -4,6 +4,7 @@ public class CPU {
 
     private final int SUPERVISOR = 0;
     private final int USER = 1;
+    private MMU mmu;
 
     private int MODE = 1; //(0 - supervizorius, 1 - vartotojas)
 
@@ -64,15 +65,43 @@ public class CPU {
     private final int REAx = 22;
     private final int WRIx = 23;
 
-    public void parseCmd(String command){
-        String cmdName = command;//TODO = grazina tik komandos pavadinima be parametru
-        switch (cmdName){//TODO
+    public int findCmd(String command){
+        switch (command){
             case "$STR":
+                return $STR;
+            case "HALT":
+                return HALT;
+            case "$END":
+                return $END;// TODO uzbaik rasyt komandas be argumentu
+        }
+        switch (command.substring(0,3)){
+            case "GBA":
+                return GBAx;
+            case "SBAx":
+                return SBAx;
+            case "LOC":
+                return LOCx;// TODO uzbaik rasyt komandas su 1 argumentu
+        }
+        switch (command.substring(0,2)){
+            case "JE":
+                return JExy;
+            case "JN":
+                return JNxy;
+            case "JB":
+                return JBxy;// TODO uzbaik rasyt komandas su 2 argumentais
+        }
+        return 1000;// error code
+    }
+
+    public int parseCmd(String command, int cmdKey){
+        switch (cmdKey){
+            case $STR:
                 format0(command);
                 break;
-            case "JE":
-                format2(command);
+            case JExy:
+                format2(command);// TODO surasyk pagal visas komandas format0 - be argumentu format1 - 1 argumentas...
         }
+        return 1001;// error code
     }
 
     public void format0(String command){
@@ -99,5 +128,13 @@ public class CPU {
         System.out.println("ADD funkcija");
         //TODO
     }
+
     //TODO write empty functions
+    public void setMODE(int MODE) {
+        this.MODE = MODE;
+    }
+
+    public void setMmu(MMU mmu) {
+        this.mmu = mmu;
+    }
 }
