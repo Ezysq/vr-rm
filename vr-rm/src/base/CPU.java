@@ -47,7 +47,7 @@ public class CPU {
     private final int JAxy = 9;
     private final int JMxy = 10;
 
-    private final int BFab = 11;
+    private final int BFxy = 11;
     private final int PDxy = 12;
     private final int GDxy = 13;
 
@@ -72,15 +72,31 @@ public class CPU {
             case "HALT":
                 return HALT;
             case "$END":
-                return $END;// TODO uzbaik rasyt komandas be argumentu
+                return $END;
+            case "ADD_":
+                return ADD_;
+            case "SUB_":
+                return SUB_;
+            case "DIV_":
+                return DIV_;
+            case "MUL_":
+                return MUL_;
+            case "CMP_":
+                return CMP_;
         }
         switch (command.substring(0,3)){
             case "GBA":
                 return GBAx;
-            case "SBAx":
+            case "SBA":
                 return SBAx;
             case "LOC":
-                return LOCx;// TODO uzbaik rasyt komandas su 1 argumentu
+                return LOCx;
+            case "UNL":
+                return UNLx;
+            case "WRI":
+                return WRIx;
+            case "REA":
+                return REAx;
         }
         switch (command.substring(0,2)){
             case "JE":
@@ -88,9 +104,93 @@ public class CPU {
             case "JN":
                 return JNxy;
             case "JB":
-                return JBxy;// TODO uzbaik rasyt komandas su 2 argumentais
+                return JBxy;
+            case "JA":
+                return JAxy;
+            case "JM":
+                return JMxy;
+            case "BF":
+                return BFxy;
+            case "PD":
+                return PDxy;
+            case "GD":
+                return GDxy;
+            case "GA":
+                return GAxy;
+            case "GB":
+                return GBxy;
+            case "SA":
+                return SAxy;
+            case "SB":
+                return SBxy;
+
         }
         return 1000;// error code
+    }
+
+    public void interpretCmd(int command){
+        switch (command){
+            case $STR:
+                break;
+            case HALT:
+                break;
+            case $END:
+                break;
+            case ADD_:
+                BA+=BB;
+                break;
+            case SUB_:
+                BA-=BB;
+                break;
+            case DIV_:
+                BB = BA%BB;
+                BA = BA/BB;
+                break;
+            case MUL_:
+                BA*=BB;
+                break;
+            case CMP_:
+
+                break;
+            case GBAx:
+                break;
+            case SBAx:
+                break;
+            case LOCx:
+                break;
+            case UNLx:
+                break;
+            case WRIx:
+                break;
+            case REAx:
+                break;
+            case JExy:
+                break;
+            case JNxy:
+                break;
+            case JBxy:
+                break;
+            case JAxy:
+                break;
+            case JMxy:
+                break;
+            case BFxy:
+                break;
+            case PDxy:
+                break;
+            case GDxy:
+                break;
+            case GAxy:
+                break;
+            case GBxy:
+                break;
+            case SAxy:
+                break;
+            case SBxy:
+                break;
+        }
+        IC++;
+        System.out.println(command + "function");
     }
 
     public int parseCmd(String command, int cmdKey){
@@ -124,10 +224,6 @@ public class CPU {
         y = Integer.parseInt (command.substring(3,4),16);
     }
 
-    public void ADD_(VM vm, int x, int y){
-        System.out.println("ADD funkcija");
-        //TODO
-    }
 
     //TODO write empty functions
     public void setMODE(int MODE) {
