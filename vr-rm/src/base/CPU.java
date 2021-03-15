@@ -4,6 +4,7 @@ public class CPU {
 
     private final int SUPERVISOR = 0;
     private final int USER = 1;
+    private MMU mmu;
 
     private int MODE = 1; //(0 - supervizorius, 1 - vartotojas)
 
@@ -43,7 +44,7 @@ public class CPU {
     private final int JExy = 6;
     private final int JNxy = 7;
     private final int JBxy = 8;
-    private final int JSxy = 9;
+    private final int JAxy = 9;
     private final int JMxy = 10;
 
     private final int BFab = 11;
@@ -59,32 +60,81 @@ public class CPU {
     private final int SAxy = 18;
     private final int SBxy = 19;
 
-    private final int LOCx = 16;
-    private final int UNLx = 16;
-    private final int REAx = 16;
-    private final int WRIx = 16;
+    private final int LOCx = 20;
+    private final int UNLx = 21;
+    private final int REAx = 22;
+    private final int WRIx = 23;
+
+    public int findCmd(String command){
+        switch (command){
+            case "$STR":
+                return $STR;
+            case "HALT":
+                return HALT;
+            case "$END":
+                return $END;// TODO uzbaik rasyt komandas be argumentu
+        }
+        switch (command.substring(0,3)){
+            case "GBA":
+                return GBAx;
+            case "SBAx":
+                return SBAx;
+            case "LOC":
+                return LOCx;// TODO uzbaik rasyt komandas su 1 argumentu
+        }
+        switch (command.substring(0,2)){
+            case "JE":
+                return JExy;
+            case "JN":
+                return JNxy;
+            case "JB":
+                return JBxy;// TODO uzbaik rasyt komandas su 2 argumentais
+        }
+        return 1000;// error code
+    }
+
+    public int parseCmd(String command, int cmdKey){
+        switch (cmdKey){
+            case $STR:
+                format0(command);
+                break;
+            case JExy:
+                format2(command);// TODO surasyk pagal visas komandas format0 - be argumentu format1 - 1 argumentas...
+        }
+        return 1001;// error code
+    }
 
     public void format0(String command){
-        if(command.length() != CMD_SIZE)
+        if(command.length() != 4)
             System.out.println("Incorrect command: " + command);
     }
-    public void format1(String command){ /** TO DO */
-        String tmp = command.substring(3).trim();
-   /*     if(tmp.length() != parameterLength)
-            System.out.println("Incorrect command: " + command);*/
-
-        x = Integer.parseInt(tmp);
-    }
-    public void format2(String command){ /** TO DO */
-        int commandLength = 2;
-      /*  String tmp1 = command.substring(commandLength, commandLength + parameterLength).trim();
-        String tmp2 = command.substring(commandLength + parameterLength).trim();
-
-        if(tmp1.length() != parameterLength || tmp2.length() != parameterLength)
+    public void format1(String command){
+        if(command.length() != 4){
             System.out.println("Incorrect command: " + command);
-
-        x = Integer.parseInt(tmp1);
-        y = Integer.parseInt(tmp2);*/
+            return;
+        }
+        x = Integer.parseInt(command.substring(3,5),16);
+    }
+    public void format2(String command){
+        if(command.length() != 4){
+            System.out.println("Incorrect command: " + command);
+            return;
+        }
+        x = Integer.parseInt(command.substring(2,3),16);
+        y = Integer.parseInt (command.substring(3,4),16);
     }
 
+    public void ADD_(VM vm, int x, int y){
+        System.out.println("ADD funkcija");
+        //TODO
+    }
+
+    //TODO write empty functions
+    public void setMODE(int MODE) {
+        this.MODE = MODE;
+    }
+
+    public void setMmu(MMU mmu) {
+        this.mmu = mmu;
+    }
 }
