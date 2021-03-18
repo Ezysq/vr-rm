@@ -15,6 +15,10 @@ public class Main {
             try{ // TODO padaryti main loopa kur bus galima ivedinet komandas
                 String arg = reader.readLine();
                 System.out.println(arg);
+                if(arg.substring(0, 4).equals("Load")){
+                    rm.loadProgram("E:\\GIT\\vr-rm\\" + arg.substring(5));
+                    System.out.println(arg.substring(5));
+                }
             }catch (IOException e){
                 e.printStackTrace();
             }

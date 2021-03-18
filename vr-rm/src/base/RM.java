@@ -22,16 +22,19 @@ public class RM {
     }
 
     public void loadProgram(String fileName){
-        if(workingVMs == 4)
+      /*  if(workingVMs == 4)
             return;
         int currVm = 0;
         for(int i = 0; i<4; i++){
-            if(VMs[i] == null)//TODO check if that makes sense
+            if(VMs[i] == null){//TODO check if that makes sense
                 currVm = i;
-        }
-        VM virtualMachine = new VM(currVm); // new VM(memory, cpu, (workingVMs));
+                break;
+            }
+        }*/ //sitoj dali kaip dar ir neriekia
+        VM virtualMachine = new VM(0); // new VM(memory, cpu, (workingVMs));
         workingVMs++;
-
+        int wCount= 0;
+        boolean start = false;
         try{
             BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
             //cpu.setIC(0);
@@ -41,8 +44,15 @@ public class RM {
                 if(currentLine.isEmpty()){
                     continue;
                 }
+                if(currentLine.equals("$STR") || start){
+                    start = true;
+                }
+                else continue;
+                if(currentLine.equals("$END"))
+                    break;
                 //System.out.println(currentLine);
-              //  int parameters = virtualMachine.saveComand(currentLine);
+                mmu.saveComand(0, currentLine);
+                wCount++;
                 //processInterrupt();
             }
             fileReader.close();
@@ -50,6 +60,7 @@ public class RM {
             System.out.println("BufferedReader exception.");
             e.printStackTrace();
         }
+        mmu.test();
         //printVMMemory();
      //   virtualMachine.excecuteCommand();
        // cpu.setMODE(SUPERVISOR);

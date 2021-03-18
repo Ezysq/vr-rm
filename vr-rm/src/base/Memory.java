@@ -10,5 +10,18 @@ public class Memory {
 
     public Memory(CPU cpu){
         this.cpu = cpu;
+        data = new Word[userMemorySize + externalMemorySize];
+        for (int i = 0; i < userMemorySize + externalMemorySize; i++){
+            data[i] = new Word();
+        }
+    }
+
+    public void write(int address, Word word){
+        System.out.println(Word.wordToInt(word));
+        data[address] = word.clone();
+    }
+
+    public Word read(int address){
+        return data[address];
     }
 }

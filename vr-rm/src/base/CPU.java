@@ -65,67 +65,96 @@ public class CPU {
     private final int REAx = 22;
     private final int WRIx = 23;
 
-    public int findCmd(String command){
+    public CPU(){
+
+    }
+
+    public int parseCmd(String command){
         switch (command){
             case "$STR":
+                format0(command);
                 return $STR;
             case "HALT":
+                format0(command);
                 return HALT;
             case "$END":
+                format0(command);
                 return $END;
             case "ADD_":
+                format0(command);
                 return ADD_;
             case "SUB_":
+                format0(command);
                 return SUB_;
             case "DIV_":
+                format0(command);
                 return DIV_;
             case "MUL_":
+                format0(command);
                 return MUL_;
             case "CMP_":
+                format0(command);
                 return CMP_;
         }
         switch (command.substring(0,3)){
             case "GBA":
+                format1(command);
                 return GBAx;
             case "SBA":
+                format1(command);
                 return SBAx;
             case "LOC":
+                format1(command);
                 return LOCx;
             case "UNL":
+                format1(command);
                 return UNLx;
             case "WRI":
+                format1(command);
                 return WRIx;
             case "REA":
+                format1(command);
                 return REAx;
         }
         switch (command.substring(0,2)){
             case "JE":
+                format2(command);
                 return JExy;
             case "JN":
+                format2(command);
                 return JNxy;
             case "JB":
+                format2(command);
                 return JBxy;
             case "JA":
+                format2(command);
                 return JAxy;
             case "JM":
+                format2(command);
                 return JMxy;
             case "BF":
+                format2(command);
                 return BFxy;
             case "PD":
+                format2(command);
                 return PDxy;
             case "GD":
+                format2(command);
                 return GDxy;
             case "GA":
+                format2(command);
                 return GAxy;
             case "GB":
+                format2(command);
                 return GBxy;
             case "SA":
+                format2(command);
                 return SAxy;
             case "SB":
+                format2(command);
                 return SBxy;
-
         }
-        return 1000;// error code
+        return 1000;//TODO raise exception or smth to non existing cmd
     }
 
     public void interpretCmd(int command){
@@ -193,20 +222,11 @@ public class CPU {
         System.out.println(command + "function");
     }
 
-    public int parseCmd(String command, int cmdKey){
-        switch (cmdKey){
-            case $STR:
-                format0(command);
-                break;
-            case JExy:
-                format2(command);// TODO surasyk pagal visas komandas format0 - be argumentu format1 - 1 argumentas...
-        }
-        return 1001;// error code
-    }
-
     public void format0(String command){
         if(command.length() != 4)
             System.out.println("Incorrect command: " + command);
+        x = -1;
+        y = -1;
     }
     public void format1(String command){
         if(command.length() != 4){
@@ -214,6 +234,7 @@ public class CPU {
             return;
         }
         x = Integer.parseInt(command.substring(3,5),16);
+        y = -1;
     }
     public void format2(String command){
         if(command.length() != 4){
@@ -232,5 +253,13 @@ public class CPU {
 
     public void setMmu(MMU mmu) {
         this.mmu = mmu;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }
