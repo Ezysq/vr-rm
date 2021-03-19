@@ -48,10 +48,12 @@ public class RM {
                     start = true;
                 }
                 else continue;
-                if(currentLine.equals("$END"))
+                if(currentLine.equals("$END")) {
+                    mmu.saveCommand(wCount, currentLine);
                     break;
+                }
                 //System.out.println(currentLine);
-                mmu.saveComand(0, currentLine);
+                mmu.saveCommand(wCount, currentLine);
                 wCount++;
                 //processInterrupt();
             }
@@ -65,5 +67,23 @@ public class RM {
      //   virtualMachine.excecuteCommand();
        // cpu.setMODE(SUPERVISOR);
         //printVMMemory();
+    }
+
+    public void executeCommand(){
+        System.out.println("Executing");
+        //cpu.setMODE(USER);
+        cpu.setIC(0);
+        int command = mmu.loadCommand(cpu.getIC());
+        //int temp = cpu.getIC();
+        //System.out.println("Testing IC:" + temp);
+        while(command != cpu.get$STR()){
+            cpu.setIC(cpu.getIC() +1);
+            command = mmu.loadCommand(cpu.getIC());
+        }
+        while(command != cpu.get$END()){
+            cpu.interpretCmd(command);
+            cpu.setIC(cpu.getIC() +1);
+            command = mmu.loadCommand(cpu.getIC());
+        }
     }
 }

@@ -15,7 +15,7 @@ public class CPU {
 
     /** RM register **/
     private int PTR;
-    private int SPTR;
+    private int SMPTR;
     private int BA;
     private int BB;
     private int IC;
@@ -32,8 +32,8 @@ public class CPU {
     private final int CMD_SIZE = 4;
     private int x, y; // Command parameters
     private final int $STR = 0;
-    private final int HALT = 99;
-    private final int $END = 100;
+    private final int HALT = 98;
+    private final int $END = 99;
 
     private final int ADD_ = 1;
     private final int SUB_ = 2;
@@ -64,6 +64,10 @@ public class CPU {
     private final int UNLx = 21;
     private final int REAx = 22;
     private final int WRIx = 23;
+
+    private final int GBBx = 24;
+    private final int SBBx = 25;
+
 
     public CPU(){
 
@@ -103,6 +107,12 @@ public class CPU {
             case "SBA":
                 format1(command);
                 return SBAx;
+            case "GBB":
+                format1(command);
+                return GBBx;
+            case "SBB":
+                format1(command);
+                return SBBx;
             case "LOC":
                 format1(command);
                 return LOCx;
@@ -179,11 +189,22 @@ public class CPU {
                 BA*=BB;
                 break;
             case CMP_:
-
+                if (BA == BB) {setZF(1); setCMPF(0);}
+                else if (BA > BB) {setCMPF(1);}
+                else {setCMPF(2);}
+                if (BA != BB) {setZF(0);}
                 break;
             case GBAx:
+                BA = mmu.readFromAdd(16*SMPTR+x);
                 break;
             case SBAx:
+                mmu.writeToAdd(16*SMPTR+x, BA);
+                break;
+            case GBBx:
+                BB = mmu.readFromAdd(16*SMPTR+x);
+                break;
+            case SBBx:
+                mmu.writeToAdd(16*SMPTR+x, BB);
                 break;
             case LOCx:
                 break;
@@ -194,14 +215,19 @@ public class CPU {
             case REAx:
                 break;
             case JExy:
+                if (getFlag("ZF") == 1) {IC = 16*x+y-1;}
                 break;
             case JNxy:
+                if (getFlag("ZF") == 0) {IC = 16*x+y-1;}
                 break;
             case JBxy:
+                if (getFlag("CMPF") == 2) {IC = 16*x+y-1;}
                 break;
             case JAxy:
+                if (getFlag("CMPF") == 1) {IC = 16*x+y-1;}
                 break;
             case JMxy:
+                IC = 16*x+y-1;
                 break;
             case BFxy:
                 break;
@@ -210,15 +236,19 @@ public class CPU {
             case GDxy:
                 break;
             case GAxy:
+                BA = mmu.readFromAdd(x*16+y);
                 break;
             case GBxy:
+                BB = mmu.readFromAdd(x*16+y);
                 break;
             case SAxy:
+                mmu.writeToAdd(16*x+y, BA);
                 break;
             case SBxy:
+                mmu.writeToAdd(16*x+y, BB);
+
                 break;
         }
-        IC++;
         System.out.println(command + "function");
     }
 
@@ -259,7 +289,63 @@ public class CPU {
         return x;
     }
 
+    public void setX(int x){ this.x = x; }
+
     public int getY() {
         return y;
+    }
+
+    public void setY(int y){ this.y = y; }
+
+    public int get$STR() {
+        return $STR;
+    }
+
+    public int get$END() {
+        return $END;
+    }
+
+    public void setIC(int i){ IC = i;}
+
+    public int getIC(){ return IC;}
+
+    public void setOF(int i){
+        if(i == 1) {
+            if (SF < 100)
+                SF += 100;
+        }
+        else {
+            if (SF >= 100)
+                SF -= 100;
+        }
+    }
+
+    public void setZF(int i){
+        if(SF >= 100)
+            SF = 100 + i*10 + SF % 10;
+        else
+            SF = i*10 + SF % 10;
+    }
+
+    public void setCMPF(int i){
+        SF = SF/10 * 10 + i;
+    }
+
+    public int getFlag(String flag){
+        String w = String.valueOf(SF);
+        while(w.length() < 3){
+            w = "0" + w;
+        }
+        switch (flag){
+            case "OF":
+                return Integer.parseInt(w.substring(0,1));
+            case "ZF":
+                return Integer.parseInt(w.substring(1,2));
+            case "CMPF":
+                return Integer.parseInt(w.substring(2,3));
+            default:
+                System.out.println("Error flag not found");
+                return -1;
+        }
     }
 }
