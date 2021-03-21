@@ -17,7 +17,8 @@ public class Main {
                 System.out.println(arg);
                 if(arg.substring(0, 4).equals("Load")){
                     rm.loadProgram("E:\\GIT\\vr-rm\\" + arg.substring(5));
-                    System.out.println(arg.substring(5));
+                    rm.executeCommand();
+                   // System.out.println(arg.substring(5));
                 }
             }catch (IOException e){
                 e.printStackTrace();

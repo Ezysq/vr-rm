@@ -17,7 +17,7 @@ public class Memory {
     }
 
     public void write(int address, Word word){
-        System.out.println(Word.wordToInt(word));
+       // System.out.println(Word.wordToInt(word));
         data[address] = word.clone();
     }
 

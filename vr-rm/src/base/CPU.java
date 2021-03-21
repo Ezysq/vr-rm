@@ -5,6 +5,7 @@ public class CPU {
     private final int SUPERVISOR = 0;
     private final int USER = 1;
     private MMU mmu;
+    private IODevice IO;
 
     private int MODE = 1; //(0 - supervizorius, 1 - vartotojas)
 
@@ -70,7 +71,7 @@ public class CPU {
 
 
     public CPU(){
-
+        IO = new IODevice();
     }
 
     public int parseCmd(String command){
@@ -230,26 +231,39 @@ public class CPU {
                 IC = 16*x+y-1;
                 break;
             case BFxy:
+                IO.setWRSize(x*16+y);
                 break;
             case PDxy:
+                int arrI[] = new int[IO.getWRSize()];
+                for(int i = 0; i < IO.getWRSize(); i++){
+                    arrI[i] = mmu.readFromAdd(x*16+y+i);
+                }
+                IO.writeMonitor(arrI);
                 break;
             case GDxy:
+                int[] arrO = IO.readKeyboard();
+                for(int i = 0; i < IO.getWRSize(); i++){
+                    mmu.writeToAdd(x*16+y+i, arrO[i]);
+                }
                 break;
             case GAxy:
                 BA = mmu.readFromAdd(x*16+y);
+                System.out.println(BA + " GA BA");
                 break;
             case GBxy:
                 BB = mmu.readFromAdd(x*16+y);
+                System.out.println(BA + " GB BB");
                 break;
             case SAxy:
                 mmu.writeToAdd(16*x+y, BA);
+                System.out.println(BA + " SA BA");
                 break;
             case SBxy:
                 mmu.writeToAdd(16*x+y, BB);
-
+                System.out.println(BA + " SB BB");
                 break;
         }
-        System.out.println(command + "function");
+     //   System.out.println(command + "function");
     }
 
     public void format0(String command){

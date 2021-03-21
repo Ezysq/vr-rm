@@ -62,7 +62,7 @@ public class RM {
             System.out.println("BufferedReader exception.");
             e.printStackTrace();
         }
-        mmu.test();
+       // mmu.test();
         //printVMMemory();
      //   virtualMachine.excecuteCommand();
        // cpu.setMODE(SUPERVISOR);
