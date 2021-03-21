@@ -177,23 +177,34 @@ public class CPU {
             case $END:
                 break;
             case ADD_:
+                if (BA < BB){setCMPF(2); setZF(0);}
+                else if (BA == BB){setCMPF(0); setZF(0);}
+                else {setCMPF(1); setZF(0);}
                 BA+=BB;
                 break;
             case SUB_:
+                if (BA < BB){setOF(1); setCMPF(2); setZF(0) ; System.out.println("Error. The result ir smaller than zero, negative values are not implemented");}
+                else if (BA == BB) {setZF(1); setCMPF(0);}
+                else {setCMPF(1); setZF(0);}
                 BA-=BB;
                 break;
             case DIV_:
+                if (BA < BB){setOF(1); setCMPF(2); setZF(0) ; System.out.println("Error. The result ir smaller than zero, negative values are not implemented");}
+                else if (BA == BB) {setZF(1); setCMPF(0);}
+                else {setCMPF(1); setZF(0);}
                 BB = BA%BB;
                 BA = BA/BB;
                 break;
             case MUL_:
+                if (BA < BB){setCMPF(2); setZF(0);}
+                else if (BA == BB){setCMPF(0); setZF(0);}
+                else {setCMPF(1); setZF(0);}
                 BA*=BB;
                 break;
             case CMP_:
                 if (BA == BB) {setZF(1); setCMPF(0);}
-                else if (BA > BB) {setCMPF(1);}
-                else {setCMPF(2);}
-                if (BA != BB) {setZF(0);}
+                else if (BA > BB) {setCMPF(1); setZF(0);}
+                else {setCMPF(2); setZF(0);}
                 break;
             case GBAx:
                 BA = mmu.readFromAdd(16*SMPTR+x);

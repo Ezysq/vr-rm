@@ -11,7 +11,7 @@ public class Main {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while (true){
-            System.out.println("Command lsit:"); // TODO parasyti kokias komadnas bus galima atlikti
+            System.out.println("Command list:"); // TODO parasyti kokias komandas bus galima atlikti
             try{ // TODO padaryti main loopa kur bus galima ivedinet komandas
                 String arg = reader.readLine();
                 System.out.println(arg);
