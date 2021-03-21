@@ -26,3 +26,13 @@ public class Main {
         }
     }
 }
+/**
+ * TODO padaryti debug mode
+ * TODO realizuoti interuptus                                                     -- SONATA
+ * TODO realizuoti vartotojo ir supervizoriaus rezimus                            -- SONATA
+ * TODO padaryt puslapiavimo mechanizma, nenuoseklia antminciu sueiti
+ * TODO atspauzdinti VM RM atmintis
+ * TODO realizuoti kazka su kietuoju disku
+ * TODO registru perdavimai su bendra atmintimi
+ * TODO semaforus
+ **/

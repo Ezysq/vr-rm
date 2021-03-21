@@ -1,9 +1,8 @@
 package base;
 
-import java.util.concurrent.Semaphore;
+public class Semaphore{
 
-public class Semaphore_ extends Semaphore {
-    int lock;
+   /* int lock;
     int count;
     public Semaphore_(int count){
         super();
@@ -21,5 +20,5 @@ public class Semaphore_ extends Semaphore {
     }
     public void V(Semaphore_ s){
         s = s + 1;
-    }
+    }*/
 }
