@@ -10,9 +10,9 @@ public class CPU {
     private int MODE = 1; //(0 - supervizorius, 1 - vartotojas)
 
     /** Timers **/
-    private int TI;
-    private int PI;
-    private int SI;
+    public int TI;
+    public int PI;
+    public int SI;
 
     /** RM register **/
     private int PTR;
@@ -373,4 +373,68 @@ public class CPU {
                 return -1;
         }
     }
+/////////////////////////////////////////////////////////
+    public int Test(){
+        if (TI != 0 || ((PI + SI)  <= 0)  ){
+            return 0;
+        }
+        else {return 1;}
+    }
+
+    public int getInterrupt(){
+        MODE = SUPERVISOR;
+        if (MODE != USER){
+            while (SI !=0 && PI !=0 && TI == 0){
+                switch (PI){
+                    case 1:
+                        System.out.println("Error: Wrong address");
+                        break;
+                    case 2:
+                        System.out.println("Error: Wrong code of the operation");
+                        break;
+                    case 3:
+                        System.out.println("Error: Wrong attribution");
+                        break;
+                    case 4:
+                        System.out.println("Error: Overflow");
+                        break;
+                    default:
+                        break;
+                }
+                switch (SI){
+                    case 1:
+                        System.out.println("GD command was called");
+                        break;
+                    case 2:
+                        System.out.println("PD command was called");
+                        break;
+                    case 3:
+                        System.out.println("HALT command was called");
+                        break;
+                    default:
+                        break;
+                }
+                if (TI == 0){
+                    System.out.println("TI occurred");
+                    }
+                }
+                resetInterrupt();
+        }
+        else {System.out.println("Error: Interrupts can only be found in user regime");}
+        MODE = USER;
+        return 0;///
+    }
+
+
+    public void resetInterrupt(){
+        PI = 0;
+        SI = 0;
+        if(TI <= 0)
+            TI = 10;
+    }
+
+
+
 }
+
+
