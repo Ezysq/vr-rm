@@ -1,4 +1,7 @@
-package base;
+package RM;
+
+import Memory.MMU;
+import RM.RM;
 
 public class CPU {
 
@@ -30,7 +33,7 @@ public class CPU {
     private int DT;
 
     /** Commands **/
-    private final int CMD_SIZE = 4;
+
     private int x, y; // Command parameters
     private final int $STR = 0;
     private final int HALT = 98;
@@ -259,31 +262,31 @@ public class CPU {
                 break;
             case GAxy:
                 BA = mmu.readFromAdd(x*16+y);
-                System.out.println(BA + " GA BA");
+                //System.out.println(BA + " GA BA");
                 break;
             case GBxy:
                 BB = mmu.readFromAdd(x*16+y);
-                System.out.println(BA + " GB BB");
+               // System.out.println(BA + " GB BB");
                 break;
             case SAxy:
                 mmu.writeToAdd(16*x+y, BA);
-                System.out.println(BA + " SA BA");
+                //System.out.println(BA + " SA BA");
                 break;
             case SBxy:
                 mmu.writeToAdd(16*x+y, BB);
-                System.out.println(BA + " SB BB");
+                //System.out.println(BA + " SB BB");
                 break;
         }
      //   System.out.println(command + "function");
     }
 
-    public void format0(String command){
+    private void format0(String command){
         if(command.length() != 4)
             System.out.println("Incorrect command: " + command);
         x = -1;
         y = -1;
     }
-    public void format1(String command){
+    private void format1(String command){
         if(command.length() != 4){
             System.out.println("Incorrect command: " + command);
             return;
@@ -291,7 +294,7 @@ public class CPU {
         x = Integer.parseInt(command.substring(3,5),16);
         y = -1;
     }
-    public void format2(String command){
+    private void format2(String command){
         if(command.length() != 4){
             System.out.println("Incorrect command: " + command);
             return;
@@ -433,7 +436,9 @@ public class CPU {
             TI = 10;
     }
 
-
+    public void printRegisters(){
+        System.out.println("PTR: "  + PTR + " SMPTR: " + SMPTR + " BA: " + BA + " BB: " + BB + " IC: " + IC + " SF: " + SF + " UM: " + UM);
+    }
 
 }
 

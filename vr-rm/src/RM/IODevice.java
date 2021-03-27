@@ -1,4 +1,6 @@
-package base;
+package RM;
+import RM.RM;
+
 import java.util.Scanner;
 
 public class IODevice {

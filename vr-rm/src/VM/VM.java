@@ -1,4 +1,4 @@
-package base;
+package VM;
 
 public class VM {
     private int ID;
