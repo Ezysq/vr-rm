@@ -48,12 +48,12 @@ public class Main {
 /**
  * DONE padaryt puslapiavimo mechanizma, nenuoseklia antminciu sueiti
  * DONE atspauzdinti VM RM atmintis
- * TODO padaryti debug mode // nepilnai padaryta truksta( Išorinių įrenginių būsenos. spausdinimo)
+ * DONE padaryti debug mode 
+ * DONE perdarity, kad butu naudojami isoriniu irenginiu busenos(registrai)
  * TODO realizuoti interuptus                                                     -- SONATA
  * TODO realizuoti vartotojo ir supervizoriaus rezimus                            -- SONATA
  * TODO realizuoti kazka su kietuoju disku
  * TODO registru perdavimai su bendra atmintimi
  * TODO semaforus
  * TODO padaryti be System.out.println( kad vaiksciotu spausdinimas per kanalu iregini(reikes 4 lab))
- * TODO perdarity, kad butu naudojami isoriniu irenginiu busenos(registrai)
  **/

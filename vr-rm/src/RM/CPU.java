@@ -26,12 +26,6 @@ public class CPU {
     private int SF;
     private int UM;
 
-    /** I/O devices **/
-    private int SB;
-    private int DB;
-    private int ST;
-    private int DT;
-
     /** Commands **/
 
     private int x, y; // Command parameters
@@ -248,17 +242,16 @@ public class CPU {
                 IO.setWRSize(x*16+y);
                 break;
             case PDxy:
-                int arrI[] = new int[IO.getWRSize()];
-                for(int i = 0; i < IO.getWRSize(); i++){
-                    arrI[i] = mmu.readFromAdd(x*16+y+i);
-                }
-                IO.writeMonitor(arrI);
+                IO.setSO(1);
+                IO.setDO(4);
+                IO.setSA(x*16+y);
+                IO.execute();
                 break;
             case GDxy:
-                int[] arrO = IO.readKeyboard();
-                for(int i = 0; i < IO.getWRSize(); i++){
-                    mmu.writeToAdd(x*16+y+i, arrO[i]);
-                }
+                IO.setSO(4);
+                IO.setDO(1);
+                IO.setDA(x*16+y);
+                IO.execute();
                 break;
             case GAxy:
                 BA = mmu.readFromAdd(x*16+y);
@@ -311,6 +304,7 @@ public class CPU {
 
     public void setMmu(MMU mmu) {
         this.mmu = mmu;
+        IO.setMmu(mmu);
     }
 
     public int getX() {
@@ -438,6 +432,7 @@ public class CPU {
 
     public void printRegisters(){
         System.out.println("PTR: "  + PTR + " SMPTR: " + SMPTR + " BA: " + BA + " BB: " + BB + " IC: " + IC + " SF: " + SF + " UM: " + UM);
+        IO.getStatus();
     }
 
 }

@@ -85,7 +85,6 @@ public class RM {
 
     public void executeProgram(){
         System.out.println("currvm: " + currVM);
-        mmu.test(currVM);
         System.out.println("Executing");
         //cpu.setMODE(USER);
         cpu.setIC(0);
@@ -117,7 +116,6 @@ public class RM {
         while(command != cpu.get$END()){
             cpu.printRegisters();
             System.out.println("cmd: " + command);
-            //TODO išorinių įrenginių būsenos.
             printVMMemory();
             cpu.interpretCmd(command);
             try {
