@@ -1,24 +1,29 @@
 package base;
 
 public class Semaphore{
+    private boolean lockedBlocks[];
 
-   /* int lock;
-    int count;
-    public Semaphore_(int count){
-        super();
-        this.count = count;
+    public Semaphore(){
+        lockedBlocks = new boolean[16];
     }
-    @override
-    public int P(Semaphore_ s){ //s - sveikas neneigiamas skaicius
-       if (s>0){
-           s -=s;
-       }
-       else if (s == 0){
 
-       }
-       else {System.out.println("Error")};
+    public void lockBlock(int x){
+        lockedBlocks[x] = true;
     }
-    public void V(Semaphore_ s){
-        s = s + 1;
+
+    public void unlockBlock(int x){
+        lockedBlocks[x] = false;
+    }
+
+    public boolean isLocked(int x){
+        return lockedBlocks[x];
+    }
+
+  /*  public void test(){
+        for(boolean i: lockedBlocks){
+            System.out.print(i + " ");
+        }
+        System.out.println();
     }*/
+
 }

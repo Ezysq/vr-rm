@@ -19,7 +19,7 @@ public class RM {
     private VM VMs[];
     private boolean VMsb[];
     private int workingVMs;
-    private int currVM = -1;
+    public int currVM = -1;
 
     public RM() {
         cpu = new CPU();
@@ -74,7 +74,7 @@ public class RM {
             System.out.println("BufferedReader exception.");
             e.printStackTrace();
         }
-       // mmu.test();
+        //mmu.test();
         //printVMMemory();
      //   virtualMachine.excecuteCommand();
        // cpu.setMODE(SUPERVISOR);
@@ -134,5 +134,9 @@ public class RM {
 
     public void printVMMemory() {
         mmu.printVMMemory();
+    }
+
+    public boolean VMExists(){
+        return workingVMs != 0;
     }
 }

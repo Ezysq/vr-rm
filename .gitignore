@@ -1,1 +1,4 @@
-vr-rm/out/production/
+vr-rm/out/
+vr-rm/.idea/
+out/
+.idea/

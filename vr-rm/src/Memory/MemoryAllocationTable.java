@@ -2,8 +2,8 @@ package Memory;
 import java.util.Random;
 
 public class MemoryAllocationTable {
-    public final int BLOCKSIZE = 16*16; // words
-    public final int USERMEMORY = 4 * BLOCKSIZE; // words
+    public final int PAGESIZE; // words
+    public final int USERMEMORY; // words
     Random rand = new Random();
 
     private Memory memory;
@@ -11,8 +11,10 @@ public class MemoryAllocationTable {
 
     public MemoryAllocationTable(Memory memory){
         this.memory = memory;
-        memoryTable = new int[BLOCKSIZE];
-        for(int i=0; i<BLOCKSIZE; i++) {
+        PAGESIZE = memory.getPAGESIZE();
+        USERMEMORY = memory.getUSERMEMORYSIZE();
+        memoryTable = new int[PAGESIZE];
+        for(int i=0; i<PAGESIZE; i++) {
             int newAdd = rand.nextInt(USERMEMORY);
             if (memory.isEmpty(newAdd)) {
                 memoryTable[i] = newAdd;
@@ -27,7 +29,7 @@ public class MemoryAllocationTable {
     }
 
     public void test(){
-        for(int i=0; i<BLOCKSIZE; i++) {
+        for(int i=0; i<PAGESIZE; i++) {
             System.out.println(i + " " + memoryTable[i]);
         }
     }

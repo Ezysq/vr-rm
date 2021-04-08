@@ -1,7 +1,7 @@
 package RM;
 
 import Memory.MMU;
-import RM.RM;
+import Exception.SemaphoreException;
 
 public class CPU {
 
@@ -24,7 +24,7 @@ public class CPU {
     private int BB;
     private int IC;
     private int SF;
-    private int UM;
+    private int LB;
 
     /** Commands **/
 
@@ -48,10 +48,7 @@ public class CPU {
     private final int BFxy = 11;
     private final int PDxy = 12;
     private final int GDxy = 13;
-
-    private final int GBAx = 14;
-    private final int SBAx = 15;
-
+// TODO PATAISYT ir sutikrint ar visos komandos yra
     private final int GAxy = 16;
     private final int GBxy = 17;
 
@@ -60,15 +57,17 @@ public class CPU {
 
     private final int LOCx = 20;
     private final int UNLx = 21;
-    private final int REAx = 22;
-    private final int WRIx = 23;
 
+    private final int GBAx = 22;
+    private final int SBAx = 23;
     private final int GBBx = 24;
     private final int SBBx = 25;
 
 
     public CPU(){
         IO = new IODevice();
+        LB = -1;
+        SMPTR = 1024;//mmu.getPAGESIZE();
     }
 
     public int parseCmd(String command){
@@ -117,12 +116,6 @@ public class CPU {
             case "UNL":
                 format1(command);
                 return UNLx;
-            case "WRI":
-                format1(command);
-                return WRIx;
-            case "REA":
-                format1(command);
-                return REAx;
         }
         switch (command.substring(0,2)){
             case "JE":
@@ -204,24 +197,40 @@ public class CPU {
                 else {setCMPF(2); setZF(0);}
                 break;
             case GBAx:
-                BA = mmu.readFromAdd(16*SMPTR+x);
+                if(LB != -1 && mmu.isLocked(LB))
+                    BA = mmu.readFromAdd(SMPTR + 16 * LB + x);
                 break;
             case SBAx:
-                mmu.writeToAdd(16*SMPTR+x, BA);
+                if(LB != -1 && mmu.isLocked(LB))
+                    mmu.writeToSMAdd(SMPTR + 16 * LB + x, BA);
                 break;
             case GBBx:
-                BB = mmu.readFromAdd(16*SMPTR+x);
+                if(LB != -1 && mmu.isLocked(LB))
+                    BB = mmu.readFromSMAdd(SMPTR + 16 * LB + x);
                 break;
             case SBBx:
-                mmu.writeToAdd(16*SMPTR+x, BB);
+                if(LB != -1 && mmu.isLocked(LB))
+                    mmu.writeToAdd(SMPTR + 16 * LB + x, BB);
                 break;
             case LOCx:
+                if(LB == -1 && !mmu.isLocked(x)) {
+                    LB = x;
+                    mmu.lockBlock(LB);
+                }
+                else {
+                    try {
+                        throw new SemaphoreException();
+                    } catch (SemaphoreException e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
             case UNLx:
-                break;
-            case WRIx:
-                break;
-            case REAx:
+                if(x == LB){
+                    mmu.unlockBlock(LB);
+                    LB = -1;
+                }
+                else //this block is not locked or not locked with this VM
                 break;
             case JExy:
                 if (getFlag("ZF") == 1) {IC = 16*x+y-1;}
@@ -284,7 +293,9 @@ public class CPU {
             System.out.println("Incorrect command: " + command);
             return;
         }
-        x = Integer.parseInt(command.substring(3,5),16);
+        x = Integer.parseInt(command.substring(3,4),16);
+        if(x*16 >= 256)
+            PI = 1;
         y = -1;
     }
     private void format2(String command){
@@ -294,10 +305,10 @@ public class CPU {
         }
         x = Integer.parseInt(command.substring(2,3),16);
         y = Integer.parseInt (command.substring(3,4),16);
+        if(x*16 >= 256)
+            PI = 1;
     }
 
-
-    //TODO write empty functions
     public void setMODE(int MODE) {
         this.MODE = MODE;
     }
@@ -390,9 +401,6 @@ public class CPU {
                         System.out.println("Error: Wrong code of the operation");
                         break;
                     case 3:
-                        System.out.println("Error: Wrong attribution");
-                        break;
-                    case 4:
                         System.out.println("Error: Overflow");
                         break;
                     default:
@@ -431,7 +439,7 @@ public class CPU {
     }
 
     public void printRegisters(){
-        System.out.println("PTR: "  + PTR + " SMPTR: " + SMPTR + " BA: " + BA + " BB: " + BB + " IC: " + IC + " SF: " + SF + " UM: " + UM);
+        System.out.println("PTR: "  + PTR + " SMPTR: " + SMPTR + " BA: " + BA + " BB: " + BB + " IC: " + IC + " SF: " + SF + " LB: " + LB);
         IO.getStatus();
     }
 

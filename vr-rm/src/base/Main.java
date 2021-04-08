@@ -25,16 +25,20 @@ public class Main {
                    // System.out.println(arg.substring(5));
                 }
                 else if(arg.startsWith("Run")){
-                    rm.executeProgram();
+                    if(rm.VMExists())
+                        rm.executeProgram();
                 }
                 else if(arg.startsWith("Debug")){
-                    rm.debugProgram();
+                    if(rm.VMExists())
+                        rm.debugProgram();
                 }
                 else if(arg.startsWith("Print memory")){
-                    rm.printMemory();
+                    if(rm.VMExists())
+                        rm.printMemory();
                 }
                 else if(arg.startsWith("Print VM memory")){
-                    rm.printVMMemory();
+                    if(rm.VMExists())
+                        rm.printVMMemory();
                 }
                 else if (arg.startsWith("Quit")){
                     break;
@@ -48,12 +52,18 @@ public class Main {
 /**
  * DONE padaryt puslapiavimo mechanizma, nenuoseklia antminciu sueiti
  * DONE atspauzdinti VM RM atmintis
- * DONE padaryti debug mode 
+ * DONE padaryti debug mode
  * DONE perdarity, kad butu naudojami isoriniu irenginiu busenos(registrai)
  * TODO realizuoti interuptus                                                     -- SONATA
  * TODO realizuoti vartotojo ir supervizoriaus rezimus                            -- SONATA
  * TODO realizuoti kazka su kietuoju disku
- * TODO registru perdavimai su bendra atmintimi
- * TODO semaforus
+ * DONE registru perdavimai su bendra atmintimi
+ * DONE semaforus
  * TODO padaryti be System.out.println( kad vaiksciotu spausdinimas per kanalu iregini(reikes 4 lab))
+ * TODO padaryti kad programa uzkrautu per kanalu irengini
+ * DONE padaryti, kad kai nera nieko uzkrauta neuzluztu "Print memmory"
+ * TODO Padaryt exceptionus
+ * Papildomi
+ * DONE Laisvi puslapiai parenkami atsitiktine tvarka
+ * DONE Leistų užkrauti kitas vartotojų programas ir valdymas būtų atiduodamas vėliausiai užkrautajai (jei laisvos atminties nepakanka apie tai pranešama)
  **/

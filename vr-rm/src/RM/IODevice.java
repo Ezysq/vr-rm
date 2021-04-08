@@ -23,7 +23,7 @@ public class IODevice {
     }
 
     public int[] readKeyboard(){
-        System.out.println("Ivesti " + WRSize + " skaicius:");
+        System.out.println("Ivesti " + WRSize + " skaiciu(s):");
         int arr[] = new int[WRSize];
         int i = 0;
         while(WRSize > i){

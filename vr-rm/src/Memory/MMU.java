@@ -2,14 +2,15 @@ package Memory;
 
 import RM.CPU;
 import RM.RM;
+import base.Semaphore;
 
 public class MMU {
-    public final int BLOCKSIZE = 16*16; // words
     private final int MAXVM = 4;
     private CPU cpu;
     private Memory memory;
     private RM rm; // nenaudojamas gal reikia istrint
     private MemoryAllocationTable userTable[];
+    private Semaphore semaphore;
 
     private int VMindex = -1;
 
@@ -18,6 +19,7 @@ public class MMU {
         this.rm = rm;
         this.memory = new Memory(/*cpu*/);
         userTable = new MemoryAllocationTable[MAXVM];
+        this.semaphore = new Semaphore();
     }
 
     public void saveCommand(int add, String cmd){
@@ -47,9 +49,17 @@ public class MMU {
         memory.write(userTable[VMindex].getRealAddress(address), Word.intToWord(word));
     }
 
-    public void test(int i){
-        userTable[i].test();
+    public int readFromSMAdd(int address){
+        return Word.wordToInt(memory.read(address));
     }
+
+    public void writeToSMAdd(int address, int word){
+        memory.write(address, Word.intToWord(word));
+    }
+
+   /* public void test(){
+        semaphore.test();
+    }*/
 
     public void newVMTable(int newVM) {
         userTable[newVM] = new MemoryAllocationTable(memory);
@@ -61,11 +71,39 @@ public class MMU {
         this.VMindex = VMindex;
     }
 
+    public void isSMLocked(int x){
+
+    }
+
     public void printMemory() {
         memory.printMemory();
     }
 
     public void printVMMemory() {
-        userTable[0].printVMMemory();
+        userTable[rm.currVM].printVMMemory();
+    }
+
+    public int getBLOCKSIZE() {
+        return memory.getBLOCKSIZE();
+    }
+
+    public int getPAGESIZE() {
+        return memory.getPAGESIZE();
+    }
+
+    public int getUSERMEMORYSIZE() {
+        return memory.getUSERMEMORYSIZE();
+    }
+
+    public boolean isLocked(int x) {
+        return semaphore.isLocked(x);
+    }
+
+    public void lockBlock(int x) {
+        semaphore.lockBlock(x);
+    }
+
+    public void unlockBlock(int x) {
+        semaphore.unlockBlock(x);
     }
 }
