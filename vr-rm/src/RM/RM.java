@@ -10,8 +10,9 @@ import java.io.InputStreamReader;
 
 public class RM {
     private CPU cpu;
-    //private Memory memory;
     private MMU mmu;
+    private Interrupt interrupt;
+    private IODevice IO;
 
     private final int SUPERVISOR = 0;
     private final int USER = 1;
@@ -22,7 +23,9 @@ public class RM {
     public int currVM = -1;
 
     public RM() {
-        cpu = new CPU();
+        IO = new IODevice();
+        interrupt = new Interrupt(IO);
+        cpu = new CPU(IO, interrupt);
         mmu = new MMU(cpu, this);
         cpu.setMmu(mmu);
         workingVMs = 0;
@@ -30,101 +33,99 @@ public class RM {
         VMsb = new boolean[4];
     }
 
-    public int loadProgram(String fileName){
-        if(workingVMs == MAXVM) {
-            System.out.println("Visos VM sukurtos");
-            return -1;
-        }
-        for(int i = 0; i<MAXVM; i++){
-            if(!VMsb[i]) {
-                currVM = i;
-                VMsb[i] = true;
-                break;
-            }
-        }
-        VM virtualMachine = new VM(currVM); // new VM(memory, cpu, (workingVMs));
-        mmu.newVMTable(currVM);
-        workingVMs++;
-        int wCount= 0;
+    public void loadProgram(){
         boolean start = false;
+        int wCount= 16;
+        cpu.setMODE(USER);
         try{
-            BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
-            //cpu.setIC(0);
+            BufferedReader fileReader = new BufferedReader(new FileReader("E:\\GIT\\vr-rm\\1.txt"));
             while(fileReader.ready()){
-             //   cpu.setMODE(USER);
                 String currentLine = fileReader.readLine();
                 if(currentLine.isEmpty()){
                     continue;
                 }
-                if(currentLine.equals("$STR") || start){
-                    start = true;
+                if(!start) {
+                    if (currentLine.equals("$STR")) {
+                        start = true;
+                        if(workingVMs == MAXVM) {
+                            System.out.println("Visos VM sukurtos");
+                            return;
+                        }
+                        System.out.println("kuriama nuaja VM");
+                        for(int i = 0; i<MAXVM; i++){
+                            if(!VMsb[i]) {
+                                currVM = i;
+                                VMsb[i] = true;
+                                break;
+                            }
+                        }
+                        VMs[currVM] = new VM(currVM); // new VM(memory, cpu, (workingVMs));
+                        mmu.newVMTable();
+                        workingVMs++;
+                        wCount= 16;
+
+                    } else continue;
                 }
-                else continue;
                 if(currentLine.equals("$END")) {
-                    mmu.saveCommand(wCount, currentLine);
-                    break;
+                    mmu.saveCommand(wCount / 16, wCount %16, currentLine);
+                    start = false;
+                    mmu.saveCPUStates(currVM);
+                    continue;
                 }
-                //System.out.println(currentLine);
-                mmu.saveCommand(wCount, currentLine);
+                mmu.saveCommand(wCount / 16, wCount %16, currentLine);
                 wCount++;
-                //processInterrupt();
             }
             fileReader.close();
         } catch (IOException e) {
             System.out.println("BufferedReader exception.");
             e.printStackTrace();
         }
-        //mmu.test();
-        //printVMMemory();
-     //   virtualMachine.excecuteCommand();
-       // cpu.setMODE(SUPERVISOR);
-        //printVMMemory();
-        //System.out.println("VMS: " + workingVMs + " curr: " + currVM);
-        return 0;
     }
 
     public void executeProgram(){
         System.out.println("currvm: " + currVM);
         System.out.println("Executing");
-        //cpu.setMODE(USER);
-        cpu.setIC(0);
-        int command = mmu.loadCommand(cpu.getIC());
-        //int temp = cpu.getIC();
-        //System.out.println("Testing IC:" + temp);
+        cpu.setMODE(USER);
+        cpu.setIC(16);
+        int command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         while(command != cpu.get$STR()){
             cpu.setIC(cpu.getIC() +1);
-            command = mmu.loadCommand(cpu.getIC());
+            command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         }
         while(command != cpu.get$END()){
             cpu.interpretCmd(command);
+            if(interrupt.checkInterrupt() == 1){
+                break;
+            }
             cpu.setIC(cpu.getIC() +1);
-            command = mmu.loadCommand(cpu.getIC());
+            command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         }
     }
 
     public void debugProgram(){
         System.out.println("Debugging");
-        //cpu.setMODE(USER);
-        cpu.setIC(0);
-        int command = mmu.loadCommand(cpu.getIC());
-        //int temp = cpu.getIC();
-        //System.out.println("Testing IC:" + temp);
+        cpu.setIC(16);
+        int command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         while(command != cpu.get$STR()){
             cpu.setIC(cpu.getIC() +1);
-            command = mmu.loadCommand(cpu.getIC());
+            command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         }
         while(command != cpu.get$END()){
             cpu.printRegisters();
             System.out.println("cmd: " + command);
             printVMMemory();
+            printMemory();
             cpu.interpretCmd(command);
+            if(interrupt.checkInterrupt() == 1){
+                break;
+            }
             try {
                 new BufferedReader(new InputStreamReader(System.in)).readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             cpu.setIC(cpu.getIC() +1);
-            command = mmu.loadCommand(cpu.getIC());
+            command = mmu.loadCommand(cpu.getIC()/16, cpu.getIC()%16);
         }
     }
 
@@ -136,7 +137,19 @@ public class RM {
         mmu.printVMMemory();
     }
 
-    public boolean VMExists(){
+    public boolean VMsExists(){
         return workingVMs != 0;
+    }
+
+    public boolean VMExists(int i){
+        if(i >=0 && i < 4)
+            return  VMsb[i];
+        return false;
+    }
+
+    public void selectProgram(int temp) {
+        currVM = temp;
+        mmu.loadCPUStates(currVM);
+        interrupt.resetTimer();
     }
 }

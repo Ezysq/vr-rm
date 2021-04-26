@@ -1,7 +1,5 @@
 package Memory;
 
-import RM.CPU;
-
 public class Memory {
     private Word data[];
     private boolean isUsed[];
@@ -9,12 +7,10 @@ public class Memory {
     private final int BLOCKSIZE = 16; // words
     private final int PAGESIZE = BLOCKSIZE * 16; // words
     private final int USERMEMORYSIZE = PAGESIZE * 4;
-   //private CPU cpu;
 
-    public Memory(/*CPU cpu*/){
-        //this.cpu = cpu;
+    public Memory(){
         data = new Word[USERMEMORYSIZE + PAGESIZE];
-        isUsed = new boolean[USERMEMORYSIZE];
+        isUsed = new boolean[4 * BLOCKSIZE];
         for (int i = 0; i < USERMEMORYSIZE + PAGESIZE ; i++){
             data[i] = new Word();
         }
@@ -38,10 +34,11 @@ public class Memory {
     }
 
     public void printMemory() {
-        int j = 0;
+        int j=0;
         for(Word word:data){
-            System.out.print(j++ + ":" + Word.wordToInt(word) + " ");
+            System.out.print(Integer.toHexString(j++).toUpperCase() + ":" + Word.wordToInt(word) + " ");
         }
+        System.out.println();
     }
 
     public int getBLOCKSIZE() {

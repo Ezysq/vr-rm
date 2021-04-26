@@ -8,21 +8,19 @@ public class MMU {
     private final int MAXVM = 4;
     private CPU cpu;
     private Memory memory;
-    private RM rm; // nenaudojamas gal reikia istrint
-    private MemoryAllocationTable userTable[];
+    private RM rm;
+    private MemoryAllocationTable userTable;
     private Semaphore semaphore;
-
-    private int VMindex = -1;
 
     public MMU(CPU cpu, RM rm){
         this.cpu = cpu;
         this.rm = rm;
-        this.memory = new Memory(/*cpu*/);
-        userTable = new MemoryAllocationTable[MAXVM];
+        this.memory = new Memory();
+        userTable = new MemoryAllocationTable(memory);
         this.semaphore = new Semaphore();
     }
 
-    public void saveCommand(int add, String cmd){
+    public void saveCommand(int x, int y, String cmd){ // turetu buti kanalu irengini
         int commandKey = cpu.parseCmd(cmd);
         Word word = new Word();
         word.setByte(0, (byte)commandKey);
@@ -32,21 +30,21 @@ public class MMU {
         if(cpu.getY() != -1){
             word.setByte(2, (byte)cpu.getY());
         }
-        memory.write(userTable[VMindex].getRealAddress(add), word); // CIAAAAAAAAAAAAAAAAAAAAAAA
+        memory.write(userTable.getRealAddress(x, y), word);
     }
 
-    public int loadCommand(int add){
-        cpu.setX(memory.read(userTable[VMindex].getRealAddress(add)).getByte(1));
-        cpu.setY(memory.read(userTable[VMindex].getRealAddress(add)).getByte(2));
-        return memory.read(userTable[VMindex].getRealAddress(add)).getByte(0);
+    public int loadCommand(int x, int y){
+        cpu.setX(memory.read(userTable.getRealAddress(x, y)).getByte(1));
+        cpu.setY(memory.read(userTable.getRealAddress(x, y)).getByte(2));
+        return memory.read(userTable.getRealAddress(x, y)).getByte(0);
     }
 
-    public int readFromAdd(int address){
-        return Word.wordToInt(memory.read(userTable[VMindex].getRealAddress(address)));
+    public int readFromAdd(int x, int y){
+        return Word.wordToInt(memory.read(userTable.getRealAddress(x, y)));
     }
 
-    public void writeToAdd(int address, int word){
-        memory.write(userTable[VMindex].getRealAddress(address), Word.intToWord(word));
+    public void writeToAdd(int x, int y, int word){
+        memory.write(userTable.getRealAddress(x, y), Word.intToWord(word));
     }
 
     public int readFromSMAdd(int address){
@@ -57,22 +55,10 @@ public class MMU {
         memory.write(address, Word.intToWord(word));
     }
 
-   /* public void test(){
-        semaphore.test();
-    }*/
-
-    public void newVMTable(int newVM) {
-        userTable[newVM] = new MemoryAllocationTable(memory);
-        VMindex = newVM;
+    public void newVMTable() {
+        userTable.create();
         System.out.println("newVMTable created");
-    }
-
-    public void setVMindex(int VMindex) {
-        this.VMindex = VMindex;
-    }
-
-    public void isSMLocked(int x){
-
+        cpu.setPTR(userTable.getPtr());
     }
 
     public void printMemory() {
@@ -80,12 +66,10 @@ public class MMU {
     }
 
     public void printVMMemory() {
-        userTable[rm.currVM].printVMMemory();
+        userTable.printVMMemory();
     }
 
-    public int getBLOCKSIZE() {
-        return memory.getBLOCKSIZE();
-    }
+    public int getBLOCKSIZE() { return memory.getBLOCKSIZE(); }
 
     public int getPAGESIZE() {
         return memory.getPAGESIZE();
@@ -106,4 +90,24 @@ public class MMU {
     public void unlockBlock(int x) {
         semaphore.unlockBlock(x);
     }
+
+    public void saveCPUStates(int VMn){
+        int add = 1024 + VMn * 16, j=0;
+        int registers[] = cpu.getRegisters();
+        for(int i:registers){
+            memory.write(add + j++, Word.intToWord(i));
+        }
+    }
+
+    public void loadCPUStates(int VMn){
+        int add = 1024 + VMn * 16;
+        int registers[] = new int[8];
+        for(int i=0; i < 8; i++){
+            registers[i] = Word.wordToInt(memory.read(add+i));
+            if(i == 1)
+                userTable.setPtr(registers[i]);
+        }
+        cpu.loadRegisters(registers);
+    }
+
 }

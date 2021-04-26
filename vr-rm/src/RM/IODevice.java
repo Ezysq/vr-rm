@@ -48,26 +48,26 @@ public class IODevice {
         switch (SO){
             case 1:
                 for (int i = 0; i < getWRSize(); i++) {
-                    arr[i] = mmu.readFromAdd(SA + i);
+                    arr[i] = mmu.readFromAdd(SA/16, SA%16 + i);
                 }
                 break;
             case 4:
                 arr = readKeyboard();
                 break;
             default:
-                return ; // TODO error
+                return ;
         }
         switch (DO){
             case 1:
                 for (int i = 0; i < getWRSize(); i++) {
-                    mmu.writeToAdd(DA + i, arr[i]);
+                    mmu.writeToAdd(DA/16, DA%16 + i, arr[i]);
                 }
                 break;
             case 4:
                 writeMonitor(arr);
                 break;
             default:
-                return ; // TODO error
+                return ;
         }
     }
 
@@ -85,22 +85,6 @@ public class IODevice {
 
     public int getWRSize(){
         return WRSize;
-    }
-
-    public int getSA() {
-        return SA;
-    }
-
-    public int getDA() {
-        return DA;
-    }
-
-    public int getSO() {
-        return SO;
-    }
-
-    public int getDO() {
-        return DO;
     }
 
     public void setSA(int SA) {

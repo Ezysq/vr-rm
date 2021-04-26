@@ -7,39 +7,49 @@ public class MemoryAllocationTable {
     Random rand = new Random();
 
     private Memory memory;
-    private int memoryTable[];
+    private int ptr;
 
     public MemoryAllocationTable(Memory memory){
         this.memory = memory;
         PAGESIZE = memory.getPAGESIZE();
         USERMEMORY = memory.getUSERMEMORYSIZE();
-        memoryTable = new int[PAGESIZE];
-        for(int i=0; i<PAGESIZE; i++) {
-            int newAdd = rand.nextInt(USERMEMORY);
+    }
+
+    public void create() {
+        int[] memoryTable = new int[memory.getBLOCKSIZE()];
+        for(int i=0; i<memory.getBLOCKSIZE(); i++) {
+            int newAdd = rand.nextInt(4 * memory.getBLOCKSIZE());
             if (memory.isEmpty(newAdd)) {
                 memoryTable[i] = newAdd;
                 memory.setIsUsed(newAdd);
             }
             else i--;
         }
-    }
-
-    public int getRealAddress(int address){
-        return memoryTable[address];
-    }
-
-    public void test(){
-        for(int i=0; i<PAGESIZE; i++) {
-            System.out.println(i + " " + memoryTable[i]);
+        ptr = memoryTable[0]*16;
+        for(int i=0; i< memory.getBLOCKSIZE(); i++) {
+            memory.write(ptr + i, Word.intToWord(memoryTable[i]));
         }
+    }
+
+    public int getRealAddress(int x, int y){
+        return Word.wordToInt(memory.read(ptr + x)) *16 + y;
     }
 
     public void printVMMemory() {
         int j = 0;
-        for(int i:memoryTable){
-            System.out.print(j++ + ":" + Word.wordToInt(memory.read(i)) + " ");
+        for(int i=0; i< 16; i++){
+            for(int y=0; y< 16; y++){
+                System.out.print(Integer.toHexString(j++).toUpperCase() + ":" + Word.wordToInt(memory.read( Word.wordToInt(memory.read(ptr + i)) * 16 + y)) + " ");
+            }
         }
         System.out.println();
     }
+
+    public int getPtr() {
+        return ptr;
+    }
+
+    public void setPtr(int ptr) {
+        this.ptr = ptr;
+    }
 }
-// Load 1.txt

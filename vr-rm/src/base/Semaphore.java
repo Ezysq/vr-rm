@@ -1,29 +1,23 @@
 package base;
 
 public class Semaphore{
-    private boolean lockedBlocks[];
+    private int lockedBlocks[];
 
     public Semaphore(){
-        lockedBlocks = new boolean[16];
+        lockedBlocks = new int[12];
     }
 
     public void lockBlock(int x){
-        lockedBlocks[x] = true;
+        if(lockedBlocks[x] == 0)
+            lockedBlocks[x]++;
     }
 
     public void unlockBlock(int x){
-        lockedBlocks[x] = false;
+        lockedBlocks[x]--;
     }
 
     public boolean isLocked(int x){
-        return lockedBlocks[x];
+        return lockedBlocks[x] != 0;
     }
-
-  /*  public void test(){
-        for(boolean i: lockedBlocks){
-            System.out.print(i + " ");
-        }
-        System.out.println();
-    }*/
 
 }
